@@ -19,15 +19,34 @@ export async function loginDrop(
   formData: FormData,
 ): Promise<{ error?: string }> {
   const password = String(formData.get("password") ?? "");
-  const next = String(formData.get("next") ?? "/shop");
-  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
-  if (!settings) return { error: "Store is not configured." };
-  const ok = await bcrypt.compare(password, settings.storefrontPasswordHash);
-  if (!ok) return { error: "Wrong password." };
-  const token = await signSession("drop");
-  const store = await cookies();
-  store.set("drop_session", token, cookieBase);
-  redirect(next.startsWith("/") ? next : "/shop");
+  const rawNext = String(formData.get("next") ?? "/shop");
+  const safeNext =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/shop";
+
+  if (!process.env.SESSION_SECRET?.trim()) {
+    return {
+      error:
+        "Server misconfiguration: add SESSION_SECRET in Vercel → Settings → Environment Variables, then redeploy.",
+    };
+  }
+
+  try {
+    const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+    if (!settings) return { error: "Store is not configured. Run the database seed." };
+    const ok = await bcrypt.compare(password, settings.storefrontPasswordHash);
+    if (!ok) return { error: "Wrong password." };
+    const token = await signSession("drop");
+    const store = await cookies();
+    store.set("drop_session", token, cookieBase);
+  } catch (e) {
+    console.error("loginDrop", e);
+    return {
+      error:
+        "Could not sign in. Check DATABASE_URL on Vercel and that the database was seeded.",
+    };
+  }
+
+  redirect(safeNext);
 }
 
 export async function logoutDrop() {
@@ -41,15 +60,34 @@ export async function loginAdmin(
   formData: FormData,
 ): Promise<{ error?: string }> {
   const password = String(formData.get("password") ?? "");
-  const next = String(formData.get("next") ?? "/admin");
-  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
-  if (!settings) return { error: "Store is not configured." };
-  const ok = await bcrypt.compare(password, settings.adminPasswordHash);
-  if (!ok) return { error: "Wrong password." };
-  const token = await signSession("admin");
-  const store = await cookies();
-  store.set("admin_session", token, cookieBase);
-  redirect(next.startsWith("/") ? next : "/admin");
+  const rawNext = String(formData.get("next") ?? "/admin");
+  const safeNext =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/admin";
+
+  if (!process.env.SESSION_SECRET?.trim()) {
+    return {
+      error:
+        "Server misconfiguration: add SESSION_SECRET in Vercel → Settings → Environment Variables, then redeploy.",
+    };
+  }
+
+  try {
+    const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+    if (!settings) return { error: "Store is not configured. Run the database seed." };
+    const ok = await bcrypt.compare(password, settings.adminPasswordHash);
+    if (!ok) return { error: "Wrong password." };
+    const token = await signSession("admin");
+    const store = await cookies();
+    store.set("admin_session", token, cookieBase);
+  } catch (e) {
+    console.error("loginAdmin", e);
+    return {
+      error:
+        "Could not sign in. Check DATABASE_URL on Vercel and that the database was seeded.",
+    };
+  }
+
+  redirect(safeNext);
 }
 
 export async function logoutAdmin() {
