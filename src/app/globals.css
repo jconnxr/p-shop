@@ -49,6 +49,30 @@ body {
   overscroll-behavior: none;
 }
 
+/* Animated IW mark — transparent, logo-sized (no video window) */
+.gate-hero-logo {
+  width: min(94vw, 30rem);
+  flex-shrink: 0;
+  line-height: 0;
+  background: transparent;
+}
+
+.gate-logo-animation__source {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gate-logo-animation__canvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
 .storefront {
   -webkit-font-smoothing: antialiased;
 }

@@ -13,7 +13,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:sync-passwords": "tsx scripts/sync-passwords.ts",
-    "assets:video": "ffmpeg -y -i public/p-shop-animation-source.mp4 -c:v libx264 -profile:v high -crf 19 -preset slow -movflags +faststart -pix_fmt yuv420p -vf scale=1280:720:flags=lanczos -an public/p-shop-animation-720.mp4 && ffmpeg -y -i public/p-shop-animation-source.mp4 -c:v libx264 -profile:v high -crf 18 -preset slow -movflags +faststart -pix_fmt yuv420p -vf scale=1920:1080:flags=lanczos -an public/p-shop-animation-1080.mp4 && cp public/p-shop-animation-720.mp4 public/p-shop-animation.mp4"
+    "assets:video": "ffmpeg -y -i public/p-shop-animation-source.mp4 -c:v libx264 -profile:v high -crf 19 -preset slow -movflags +faststart -pix_fmt yuv420p -vf scale=1280:720:flags=lanczos -an public/p-shop-animation-720.mp4 && ffmpeg -y -i public/p-shop-animation-source.mp4 -c:v libx264 -profile:v high -crf 18 -preset slow -movflags +faststart -pix_fmt yuv420p -vf scale=1920:1080:flags=lanczos -an public/p-shop-animation-1080.mp4 && cp public/p-shop-animation-720.mp4 public/p-shop-animation.mp4 && ffmpeg -y -i public/p-shop-animation-source.mp4 -vf scale=1280:-2:flags=lanczos,format=rgba,chromakey=0x02183d:0.15:0.08 -c:v libvpx-vp9 -pix_fmt yuva420p -auto-alt-ref 0 -crf 36 -b:v 0 -an public/p-shop-animation-alpha.webm"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

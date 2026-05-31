@@ -5,12 +5,9 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useId, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { loginDrop } from "@/app/actions/auth";
+import { GateLogoAnimation } from "@/components/gate-logo-animation";
 import { StoreLogo } from "@/components/store-chrome";
 import { useVisualViewport } from "@/hooks/use-visual-viewport";
-
-const VIDEO_720 = "/p-shop-animation-720.mp4";
-const VIDEO_1080 = "/p-shop-animation-1080.mp4";
-const POSTER = "/p-shop-animation-poster@2x.jpg";
 
 type Props = {
   nextPath: string;
@@ -24,15 +21,8 @@ function SubmitLabel() {
   return pending ? "…" : "Enter";
 }
 
-function pickVideoSrc(): string {
-  if (typeof window === "undefined") return VIDEO_720;
-  const narrow = window.matchMedia("(max-width: 768px)").matches;
-  return narrow ? VIDEO_720 : VIDEO_1080;
-}
-
 export function HomeLanding({ nextPath, hasSession, storeName, passwordHint }: Props) {
   const router = useRouter();
-  const videoRef = useRef<HTMLVideoElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
   const [state, formAction] = useActionState(loginDrop, null);
@@ -45,65 +35,41 @@ export function HomeLanding({ nextPath, hasSession, storeName, passwordHint }: P
     }
   }, [state, nextPath, router]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const src = pickVideoSrc();
-    video.src = src;
-    video.load();
-    void video.play().catch(() => {});
-  }, []);
-
   return (
     <div
       className="gate-splash flex min-h-dvh flex-col bg-white text-black"
       style={{ paddingBottom: keyboardInset > 0 ? keyboardInset : undefined }}
     >
-      <header className="flex items-center justify-between px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
-        <span className="w-12" aria-hidden />
+      <header className="flex shrink-0 items-center justify-end px-4 pb-0 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6">
         <Link
           href="/admin/login"
-          className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/45 transition hover:text-black"
+          className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/40 transition hover:text-black"
         >
           Admin
         </Link>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
-        <div className="flex w-full max-w-[20rem] flex-col items-center sm:max-w-[24rem]">
-          <div className="w-full overflow-hidden">
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster={POSTER}
-              className="mx-auto aspect-square w-full max-w-[min(100%,18rem)] object-contain"
-              aria-label={`${storeName} entrance animation`}
-            />
-          </div>
+      <main className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2">
+        <GateLogoAnimation storeName={storeName} className="gate-hero-logo" />
 
-          <div className="mt-6 w-full">
-            <StoreLogo className="mx-auto h-8 w-auto sm:h-9" />
-          </div>
+        <div className="mt-6 flex w-full max-w-[16rem] flex-col items-center sm:mt-8">
+          <StoreLogo className="h-7 w-auto sm:h-8" />
 
           {hasSession ? (
             <Link
               href={nextPath}
-              className="mt-8 text-sm font-medium uppercase tracking-[0.35em] text-black transition hover:opacity-55"
+              className="mt-7 text-sm font-medium uppercase tracking-[0.35em] text-black transition hover:opacity-55"
             >
               Enter shop
             </Link>
           ) : (
             <form
               action={formAction}
-              className="mt-8 flex w-full flex-col items-center gap-5"
+              className="mt-7 flex w-full flex-col items-center gap-4"
             >
               <input type="hidden" name="next" value={nextPath} />
 
-              <div className="w-full max-w-[13rem]">
+              <div className="w-full">
                 <label htmlFor={inputId} className="sr-only">
                   Password
                 </label>
@@ -118,10 +84,10 @@ export function HomeLanding({ nextPath, hasSession, storeName, passwordHint }: P
                   placeholder="Password"
                   onFocus={() => {
                     window.setTimeout(() => {
-                      inputRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+                      inputRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
                     }, 280);
                   }}
-                  className="w-full border-0 border-b border-black/25 bg-transparent py-2.5 text-center font-[family-name:var(--font-display)] text-base text-black outline-none placeholder:text-black/30 focus:border-black"
+                  className="w-full border-0 border-b border-black/25 bg-transparent py-2 text-center font-[family-name:var(--font-display)] text-base text-black outline-none placeholder:text-black/30 focus:border-black"
                 />
               </div>
 
