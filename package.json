@@ -12,7 +12,8 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "db:sync-passwords": "tsx scripts/sync-passwords.ts"
+    "db:sync-passwords": "tsx scripts/sync-passwords.ts",
+    "assets:video": "ffmpeg -y -i public/p-shop-animation-source.mp4 -c:v libx264 -profile:v high -crf 19 -preset slow -movflags +faststart -pix_fmt yuv420p -vf scale=1280:720:flags=lanczos -an public/p-shop-animation-720.mp4 && ffmpeg -y -i public/p-shop-animation-source.mp4 -c:v libx264 -profile:v high -crf 18 -preset slow -movflags +faststart -pix_fmt yuv420p -vf scale=1920:1080:flags=lanczos -an public/p-shop-animation-1080.mp4 && cp public/p-shop-animation-720.mp4 public/p-shop-animation.mp4"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

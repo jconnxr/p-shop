@@ -6,6 +6,10 @@ import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { loginDrop } from "@/app/actions/auth";
 
+const VIDEO_720 = "/p-shop-animation-720.mp4";
+const VIDEO_1080 = "/p-shop-animation-1080.mp4";
+const POSTER = "/p-shop-animation-poster@2x.jpg";
+
 type Props = {
   nextPath: string;
   hasSession: boolean;
@@ -16,6 +20,15 @@ type Props = {
 function SubmitLabel() {
   const { pending } = useFormStatus();
   return pending ? "…" : "Enter";
+}
+
+function pickVideoSrc(): string {
+  if (typeof window === "undefined") return VIDEO_720;
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const narrow = window.matchMedia("(max-width: 768px)").matches;
+  const lowMem = navigator.deviceMemory != null && navigator.deviceMemory <= 4;
+  if (coarse || narrow || lowMem) return VIDEO_720;
+  return VIDEO_1080;
 }
 
 export function HomeLanding({ nextPath, hasSession, storeName, passwordHint }: Props) {
@@ -33,7 +46,20 @@ export function HomeLanding({ nextPath, hasSession, storeName, passwordHint }: P
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    void video.play().catch(() => {});
+
+    const applySrc = () => {
+      const src = pickVideoSrc();
+      if (video.dataset.src === src) return;
+      video.dataset.src = src;
+      video.src = src;
+      video.load();
+      void video.play().catch(() => {});
+    };
+
+    applySrc();
+    const desktopMq = window.matchMedia("(min-width: 1024px)");
+    desktopMq.addEventListener("change", applySrc);
+    return () => desktopMq.removeEventListener("change", applySrc);
   }, []);
 
   return (
@@ -44,18 +70,18 @@ export function HomeLanding({ nextPath, hasSession, storeName, passwordHint }: P
         muted
         loop
         playsInline
-        preload="none"
-        poster="/p-shop-animation-poster.jpg"
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        preload="metadata"
+        poster={POSTER}
+        className="absolute inset-0 h-full w-full object-cover object-center [transform:translateZ(0)] [-webkit-backface-visibility:hidden]"
         aria-label={`${storeName} entrance animation`}
-      >
-        <source src="/p-shop-animation.mp4" type="video/mp4" />
-      </video>
+      />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex justify-center px-6 pt-6 sm:pt-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/iveywood-logo-sm.png"
+          src="/iveywood-logo-hd.png"
+          srcSet="/iveywood-logo-sm.png 200w, /iveywood-logo-hd.png 320w"
+          sizes="160px"
           alt={storeName}
           width={160}
           height={64}
