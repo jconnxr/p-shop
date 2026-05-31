@@ -91,8 +91,14 @@ const LEGACY_MOCK_SLUGS = [
 ];
 
 async function main() {
-  const drop = process.env.SEED_DROP_PASSWORD ?? process.env.DROP_PASSWORD ?? "test101";
-  const admin = process.env.SEED_ADMIN_PASSWORD ?? process.env.ADMIN_PASSWORD ?? "admin";
+  const drop =
+    process.env.SEED_DROP_PASSWORD?.trim() ||
+    process.env.DROP_PASSWORD?.trim().replace(/^["']|["']$/g, "") ||
+    "test101";
+  const admin =
+    process.env.SEED_ADMIN_PASSWORD?.trim() ||
+    process.env.ADMIN_PASSWORD?.trim().replace(/^["']|["']$/g, "") ||
+    "admin";
   const storefrontPasswordHash = await bcrypt.hash(drop, 12);
   const adminPasswordHash = await bcrypt.hash(admin, 12);
   await prisma.siteSettings.upsert({

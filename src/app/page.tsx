@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { HomeLanding } from "@/components/home-landing";
 import { verifySessionToken } from "@/lib/auth";
-import { envDropPassword } from "@/lib/drop-password";
+import { DEFAULT_DROP_PASSWORD, envDropPassword } from "@/lib/drop-password";
 
 export const metadata: Metadata = {
   title: "Iveywood — Private drop",
@@ -19,7 +19,9 @@ export default async function HomePage({
   const hasSession = await verifySessionToken(token, "drop");
   const nextPath = sp.next && sp.next.startsWith("/") ? sp.next : "/shop";
   const passwordHint =
-    process.env.NODE_ENV === "development" ? envDropPassword() : undefined;
+    process.env.NODE_ENV === "development"
+      ? (envDropPassword() ?? DEFAULT_DROP_PASSWORD)
+      : undefined;
 
   return (
     <HomeLanding

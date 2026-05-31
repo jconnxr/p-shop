@@ -1,11 +1,10 @@
 "use server";
 
-import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { signSession } from "@/lib/auth";
+import { verifyAdminPassword } from "@/lib/admin-password";
 import { verifyDropPassword } from "@/lib/drop-password";
-import { prisma } from "@/lib/prisma";
 
 const cookieBase = {
   httpOnly: true,
@@ -68,9 +67,7 @@ export async function loginAdmin(
   }
 
   try {
-    const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
-    if (!settings) return { error: "Store is not configured. Run the database seed." };
-    const ok = await bcrypt.compare(password, settings.adminPasswordHash);
+    const ok = await verifyAdminPassword(password);
     if (!ok) return { error: "Wrong password." };
     const token = await signSession("admin");
     const store = await cookies();
