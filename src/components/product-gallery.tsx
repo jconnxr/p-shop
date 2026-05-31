@@ -4,21 +4,38 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import type { ProductImage } from "@/lib/products";
 
-export function ProductGallery({ name, images }: { name: string; images: ProductImage[] }) {
+export function ProductGallery({
+  name,
+  images,
+  variant = "dark",
+}: {
+  name: string;
+  images: ProductImage[];
+  variant?: "dark" | "light";
+}) {
+  const light = variant === "light";
   const [active, setActive] = useState(0);
   const current = images[active];
 
   if (images.length === 0) {
     return (
-      <div className="flex aspect-[3/4] items-center justify-center rounded-sm bg-card ring-1 ring-border">
-        <span className="text-sm text-muted">No images</span>
+      <div
+        className={`flex aspect-[4/5] items-center justify-center ${
+          light ? "bg-[#f4f4f4]" : "rounded-sm bg-card ring-1 ring-border"
+        }`}
+      >
+        <span className={`text-sm ${light ? "text-black/35" : "text-muted"}`}>No images</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-card ring-1 ring-border">
+      <div
+        className={`relative aspect-[4/5] overflow-hidden ${
+          light ? "bg-[#f4f4f4]" : "rounded-sm bg-card ring-1 ring-border"
+        }`}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={current.url}
@@ -44,8 +61,14 @@ export function ProductGallery({ name, images }: { name: string; images: Product
               key={img.url}
               type="button"
               onClick={() => setActive(i)}
-              className={`relative h-16 w-14 shrink-0 overflow-hidden rounded-sm ring-1 transition ${
-                i === active ? "ring-accent" : "ring-border opacity-70 hover:opacity-100"
+              className={`relative h-16 w-14 shrink-0 overflow-hidden ring-1 transition ${
+                light
+                  ? i === active
+                    ? "ring-black"
+                    : "ring-black/15 opacity-70 hover:opacity-100"
+                  : i === active
+                    ? "ring-accent"
+                    : "ring-border opacity-70 hover:opacity-100"
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

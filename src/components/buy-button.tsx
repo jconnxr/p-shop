@@ -7,9 +7,11 @@ type Props = {
   productId: string;
   disabled?: boolean;
   stripeReady: boolean;
+  variant?: "dark" | "light";
 };
 
-export function BuyButton({ productId, disabled, stripeReady }: Props) {
+export function BuyButton({ productId, disabled, stripeReady, variant = "dark" }: Props) {
+  const light = variant === "light";
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -34,7 +36,7 @@ export function BuyButton({ productId, disabled, stripeReady }: Props) {
 
   if (!stripeReady) {
     return (
-      <p className="text-sm text-muted">
+      <p className={`text-sm ${light ? "text-black/50" : "text-muted"}`}>
         Online checkout is not configured yet. Add Stripe keys to enable purchases.
       </p>
     );
@@ -48,11 +50,17 @@ export function BuyButton({ productId, disabled, stripeReady }: Props) {
         whileTap={{ scale: disabled ? 1 : 0.98 }}
         onClick={() => void checkout()}
         disabled={disabled || loading}
-        className="w-full rounded-full bg-foreground px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] text-background transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+        className={
+          light
+            ? "w-full bg-black px-8 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+            : "w-full rounded-full bg-foreground px-8 py-4 text-sm font-medium uppercase tracking-[0.2em] text-background transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+        }
       >
         {loading ? "Redirecting…" : disabled ? "Sold out" : "Purchase"}
       </motion.button>
-      {err ? <p className="text-center text-sm text-red-400">{err}</p> : null}
+      {err ? (
+        <p className={`text-center text-sm ${light ? "text-red-600" : "text-red-400"}`}>{err}</p>
+      ) : null}
     </div>
   );
 }
